@@ -7,7 +7,7 @@ import seaborn as sns
 # Set page configuration
 st.set_page_config(
     page_title="Maternal Health Risk Predictor",
-    layout="centered",
+    layout="centered", #centered #wide
     initial_sidebar_state="auto", #collapsed
 )
 

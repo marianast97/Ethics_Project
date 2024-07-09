@@ -16,7 +16,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 # Set page configuration
 st.set_page_config(
     #page_title="Maternal Health Risk Predictor",
-    layout="centered",
+    layout="centered", #centered #wide
     initial_sidebar_state="expanded",
 )
 
@@ -33,7 +33,9 @@ def main():
     st.title("Maternal Health Risk Predictor")
     st.write("\n\n\n")
 
-    st.write("Data was collected from five hospitals and one maternity clinic in Dhaka, Bangladesh. The collection process was done via a questionnaire, made from previous medical studies and by discussions with people in the field of medicine. The patient’s health data was also collected through wearable sensing devices, and the final dataset was made by merging the two.")
+    st.write("""Data were collected from five hospitals and a maternity clinic in Dhaka, Bangladesh.
+    Patient health data was collected using wearable sensor devices, and risk levels were classified with the help of medical experts and literature review.
+    """)
 
     # Add DOI link to sidebar
     st.write(
@@ -43,25 +45,54 @@ def main():
     )
     
     st.write("**Author**: Marzia Ahmed")
-    st.write("**Dataset donated on**: 14/8/2023")
+    st.write("**Dataset donated on**: 14.08.2023")
 
+
+    # Create a DataFrame with the given information
+    info = {
+        "Attribute Name": ["Age", "SystolicBP", "DiastolicBP", "BS", "BodyTemp", "HeartRate", "RiskLevel"],
+        "Role": ["Feature", "Feature", "Feature", "Feature", "Feature", "Feature", "Target"],
+        "Type": ["Integer", "Integer", "Integer", "Integer", "Integer", "Integer", "Categorical"],
+        "Description": [
+            "Any ages in years when a women during pregnant.",
+            "Upper value of Blood Pressure in mmHg, another significant attribute during pregnancy.",
+            "Lower value of Blood Pressure in mmHg, another significant attribute during pregnancy.",
+            "Blood glucose levels is in terms of a molar concentration (mmol/L)",
+            "Body Temperature (F)",
+            "A normal resting heart rate (bpm)",
+            "Predicted Risk Intensity Level during pregnancy considering the previous attribute."
+        ],
+        "Missing Values": ["no", "no", "no", "no", "no", "no", "no"]
+    }
+
+    df_info = pd.DataFrame(info)
+
+    # Display the table in Streamlit
+    st.markdown("### Attribute Information")
+    st.write("""
+    This table provides detailed information about each variable in the dataset. 
+
+    - **Attribute Name**: The name of the variable.
+    - **Role**: Whether the variable is a feature (used for prediction) or the target (the outcome we are predicting).
+    - **Type**: The data type of the variable (e.g., Integer, Categorical).
+    - **Description**: A brief explanation of what the variable represents.
+    - **Missing Values**: Indicates if there are any missing values for the variable.
+    """)
+    st.dataframe(df_info, hide_index=True)
+
+    
     # Load Dataset
     df, target = load_data()
-    
-    # Display dataset
-    st.markdown("### Maternal Health Risk Dataset")
 
-    st.dataframe(df)
-
+    # Sidebar Info
     categorical = ["Age"]
     attributes = df.columns.tolist()
-
     st.sidebar.header("Selection Options")
     selected_attribute = st.sidebar.selectbox('Select an attribute', attributes)
 
+    # Initialize filtered_df based on the data type of selected_attribute
     st.sidebar.header("Filter Options")
 
-    # Initialize filtered_df based on the data type of selected_attribute
     if df[selected_attribute].dtype == 'object':
         unique_values = df[selected_attribute].unique().tolist()
         selected_values = st.sidebar.multiselect(f'Select {selected_attribute} values', unique_values, default=unique_values)
@@ -77,7 +108,7 @@ def main():
 
 
     st.write("\n\n\n")
-    st.write("### Distribution of the attributes")
+    st.write("### Attribute distribution")
     st.write("In the sidebar, select the attribute for which you want to see the distribution.")
     st.write("You can also filter the data based on the attribute values.")
     st.write("The graph shows the distribution of the selected filtered attribute collored by the risk classification level.")
@@ -104,6 +135,13 @@ def main():
     fig.update_traces(marker_line=dict(width=1, color='white'))
 
     st.plotly_chart(fig)
+
+    # Display dataset
+    st.markdown("### The Dataset")
+    st.write("""Below you can find the dataset used in this application.
+    You can filter the data using the Selection & Filter Options on the sidebar.""")
+    st.dataframe(filtered_df)
+
     
 
 if __name__ == "__main__":
