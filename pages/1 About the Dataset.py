@@ -13,12 +13,14 @@ import shap
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+
 # Set page configuration
 st.set_page_config(
-    #page_title="Maternal Health Risk Predictor",
+    #page_title="Maternal Health Risk Dataset",
     layout="centered", #centered #wide
     initial_sidebar_state="expanded",
 )
+
 
 # Load dataset
 @st.cache_data
@@ -30,8 +32,12 @@ def load_data():
 def main():
     # Page Title
     st.markdown("## About the Dataset")
-    st.title("Maternal Health Risk Predictor")
+    st.title("Maternal Health Risk Dataset")
     st.write("\n\n\n")
+
+    st.warning('''If the mother presents a significant symptom not considered
+    by the model (e.g., stroke symptoms), disregard the model's prediction and
+    base the urgency purely on medical judgment.''', icon="⚠️")
 
     st.write("""Data were collected from five hospitals and a maternity clinic in Dhaka, Bangladesh.
     Patient health data was collected using wearable sensor devices, and risk levels were classified with the help of medical experts and literature review.

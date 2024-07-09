@@ -11,6 +11,7 @@ st.set_page_config(
     initial_sidebar_state="auto", #collapsed
 )
 
+
 # Load the Data set
 df = pd.read_csv("./Maternal Health Risk Data Set.csv")
 
@@ -19,9 +20,10 @@ df = pd.read_csv("./Maternal Health Risk Data Set.csv")
 # Main page title and welcome message
 st.title("Welcome to HealthyMom App")
 
-
 st.markdown("""
-This app allows you to explore the predictions of maternal health, the dataset used to train the prediction model and it aims to explain how the model performed its prediction.
+The **HealthyMom App** is designed to support healthcare professionals in the triage process of maternity hospitals.
+By providing predictions of maternal health risks, our app aims to contribute to Maternal Health,
+ensuring that expectant mothers receive the appropriate level of care quickly and efficiently.
 """)
 
 # Display image on Home
