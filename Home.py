@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 # Set page configuration
 st.set_page_config(
@@ -11,7 +9,6 @@ st.set_page_config(
     initial_sidebar_state="auto", #collapsed
 )
 
-
 # Load the Data set
 df = pd.read_csv("./Maternal Health Risk Data Set.csv")
 
@@ -19,6 +16,11 @@ df = pd.read_csv("./Maternal Health Risk Data Set.csv")
 
 # Main page title and welcome message
 st.title("Welcome to HealthyMom App")
+
+st.logo(
+    "./love.png",
+    icon_image="./heartbeat.gif",
+)
 
 st.markdown("""
 The **HealthyMom App** is designed to support healthcare professionals in the triage process of maternity hospitals.

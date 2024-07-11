@@ -7,12 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import accuracy_score, confusion_matrix
-import seaborn as sns
 import matplotlib.pyplot as plt
-import shap
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
-
 
 # Set page configuration
 st.set_page_config(
@@ -20,7 +17,6 @@ st.set_page_config(
     layout="centered", #centered #wide
     initial_sidebar_state="expanded",
 )
-
 
 # Load dataset
 @st.cache_data
@@ -33,6 +29,10 @@ def main():
     # Page Title
     st.markdown("## About the Dataset")
     st.title("Maternal Health Risk Dataset")
+    st.logo(
+        "./love.png",
+        icon_image="./heartbeat.gif",
+    )
     st.write("\n\n\n")
 
     st.warning('''If the mother presents a significant symptom not considered
@@ -117,7 +117,6 @@ def main():
 
     st.plotly_chart(fig)
     
-    
     # Create a DataFrame with the given information
     info = {
         "Attribute Name": ["Age", "SystolicBP", "DiastolicBP", "BS", "BodyTemp", "HeartRate", "RiskLevel"],
@@ -150,7 +149,6 @@ def main():
     """)
     st.dataframe(df_info, hide_index=True)
 
-    
 
 if __name__ == "__main__":
     main()
