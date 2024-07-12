@@ -135,17 +135,42 @@ def main():
         st.metric(label="**HeartRate**", value=new_sample['HeartRate'][0], delta=new_sample['HeartRate'][0] - sample['HeartRate'])
         
     st.write("\n\n\n\n")
+
+
     
     col1, col2 = st.columns(2)
     with col1:
         explainer = ClassifierExplainer(model, X_test, y_test)
+
         prediction_component = ClassifierPredictionSummaryComponent(explainer, title="Original Prediction", index=index, hide_selector=True)
         prediction_component_html = prediction_component.to_html()
         st.components.v1.html(prediction_component_html, height=560, scrolling=False)
         string = ""
-        for i, label in enumerate(label_encoder.classes_):
-            string += f"{i}: {label},  ‎ " 
-        st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
+        #for i, label in enumerate(label_encoder.classes_):
+        #    string += f"{i}: {label},  ‎ " 
+        #st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
+
+        predicted_class = model.predict(X_test.iloc[[index]])[0]
+        class_name = label_encoder.classes_[predicted_class]
+        
+         # Traffic light colors for classes
+        color_map = {
+            0: {"background": "red", "color": "white"},
+            1: {"background": "green", "color": "white"},
+            2: {"background": "yellow", "color": "black"}
+        }
+        color = color_map.get(predicted_class, {"background": "black", "color": "white"})
+        
+        st.markdown(f"""
+        <div style='background-color: {color['background']}; padding: 10px; border-radius: 5px; color: {color['color']};'>
+            Predicted class: {class_name} (class {predicted_class})
+        </div>
+        """, unsafe_allow_html=True)
+
+
+
+
+    
         
     with col2: 
         X_test_mod.loc[sample_index] = new_sample.loc[0]
@@ -155,9 +180,26 @@ def main():
         prediction_component_html = prediction_component.to_html()
         st.components.v1.html(prediction_component_html, height=560, scrolling=False)
         string = ""
-        for i, label in enumerate(label_encoder.classes_):
-            string += f"{i}: {label},  ‎ " 
-        st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
+        #for i, label in enumerate(label_encoder.classes_):
+        #    string += f"{i}: {label},  ‎ " 
+        #st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
+
+        predicted_class = model.predict(X_test_mod.iloc[[index]])[0]
+        class_name = label_encoder.classes_[predicted_class]
+        
+         # Traffic light colors for classes
+        color_map = {
+            0: {"background": "red", "color": "white"},
+            1: {"background": "green", "color": "white"},
+            2: {"background": "yellow", "color": "black"}
+        }
+        color = color_map.get(predicted_class, {"background": "black", "color": "white"})
+        
+        st.markdown(f"""
+        <div style='background-color: {color['background']}; padding: 10px; border-radius: 5px; color: {color['color']};'>
+            Predicted class: {class_name} (class {predicted_class})
+        </div>
+        """, unsafe_allow_html=True)
     
     st.toast('Simulator loaded', icon="✔️")
     st.write("One can see how the output class probabilities change as the attribute values are modified.")
