@@ -66,6 +66,7 @@ def main():
     st.write("\n\n")
     st.write("### What if... ?")
     st.write("Select a sample from the sidebar to view and modify the feature values. The model prediction will be updated accordingly.")
+    st.write("The new sample values are displayed below, alongwith the change from the original sample values.")
     
     model = load_model()
     model = model.fit(X_train, y_train)
@@ -94,40 +95,59 @@ def main():
     # st.components.v1.html(what_if_html, width=800, height=2000, scrolling=False)
     
     index = st.sidebar.selectbox("Select a `mother_id` to view and modify", options=range(len(X_test)))
-    st.write(f"Selected mother_id: {index}")
+    st.write(f"Selected *mother_id*: {index}")
     
     sample_df = df_og.loc[[X_test.index[index]]]
     sample_df = sample_df.to_frame().T if isinstance(sample_df, pd.Series) else sample_df
 
-    col1, col2 = st.columns(2)
     X_test_mod = X_test.copy()
     
+    sample = X_test.iloc[index]
+    sample_index = X_test.index[index]    
+    sample_df = df_og.loc[[X_test.index[index]]]
+    
+    # Create sliders for each feature to modify the values
+    st.sidebar.write("Change feature values here:")
+    new_values = {}
+    for col in sample.index:
+        new_values[col] = st.sidebar.slider(col, int(X[col].min()), int(X[col].max()), int(sample[col]))
+    
+    # Create a DataFrame with the new values
+    new_sample = pd.DataFrame([new_values])
+    
+    # Display the new feature values
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    with c1:
+        st.metric(label="**Age**", value=new_sample['Age'][0], delta=new_sample['Age'][0] - sample['Age'])
+    with c2:
+        st.metric(label="**SystolicBP**", value=new_sample['SystolicBP'][0], delta=new_sample['SystolicBP'][0] - sample['SystolicBP'])
+    with c3:
+        st.metric(label="**DiastolicBP**", value=new_sample['DiastolicBP'][0], delta=new_sample['DiastolicBP'][0] - sample['DiastolicBP'])
+    with c4:
+        st.metric(label="**BS**", value=new_sample['BS'][0], delta=new_sample['BS'][0] - sample['BS'])
+    with c5:
+        st.metric(label="**BodyTemp**", value=new_sample['BodyTemp'][0], delta=new_sample['BodyTemp'][0] - sample['BodyTemp'])
+    with c6:
+        st.metric(label="**HeartRate**", value=new_sample['HeartRate'][0], delta=new_sample['HeartRate'][0] - sample['HeartRate'])
+        
+    st.write("\n\n\n\n")
+    
+    col1, col2 = st.columns(2)
     with col1:
-        sample = X_test.iloc[index]
-        sample_index = X_test.index[index]
+        explainer = ClassifierExplainer(model, X_test, y_test)
+        prediction_component = ClassifierPredictionSummaryComponent(explainer, title="Original Prediction", index=index, hide_selector=True)
+        prediction_component_html = prediction_component.to_html()
+        st.components.v1.html(prediction_component_html, height=560, scrolling=False)
+        string = ""
+        for i, label in enumerate(label_encoder.classes_):
+            string += f"{i}: {label},  ‎ " 
+        st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
         
-        sample_df = df_og.loc[[X_test.index[index]]]
-        # sample_df = sample_df.to_frame() if isinstance(sample_df, pd.Series) else sample_df
-        st.sidebar.write("Original Sample:")
-        st.sidebar.dataframe(sample_df, hide_index=True)
-        
-        # Create sliders for each feature to modify the values
-        new_values = {}
-        for col in sample.index:
-            new_values[col] = st.slider(col, int(X[col].min()), int(X[col].max()), int(sample[col]))
-
-        # Create a DataFrame with the new values
-        new_sample = pd.DataFrame([new_values])
-        
-        # Display the new feature values
-        st.sidebar.write("Modified Sample:")
-        st.sidebar.dataframe(new_sample, hide_index=True)
-        
+    with col2: 
         X_test_mod.loc[sample_index] = new_sample.loc[0]
         
-    with col2:
         explainer = ClassifierExplainer(model, X_test_mod, y_test)
-        prediction_component = ClassifierPredictionSummaryComponent(explainer, index=index, hide_selector=True)
+        prediction_component = ClassifierPredictionSummaryComponent(explainer, title="New Prediction", index=index, hide_selector=True)
         prediction_component_html = prediction_component.to_html()
         st.components.v1.html(prediction_component_html, height=560, scrolling=False)
         string = ""
@@ -136,6 +156,7 @@ def main():
         st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
     
     st.toast('Simulator loaded', icon="✔️")
+    st.write("One can see how the output class probabilities change as the feature values are modified.")
     
     st.write("\n\n")
     st.write("### Key Findings")
