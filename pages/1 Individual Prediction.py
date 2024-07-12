@@ -92,9 +92,9 @@ def main():
     
      # Traffic light colors for classes
     color_map = {
-        0: {"background": "red", "color": "white"},
-        1: {"background": "green", "color": "white"},
-        2: {"background": "yellow", "color": "black"}
+        0: {"background": "#EA324C", "color": "white"},
+        1: {"background": "#00B38A", "color": "white"},
+        2: {"background": "#F2AC42", "color": "black"}
     }
     color = color_map.get(predicted_class, {"background": "black", "color": "white"})
     
