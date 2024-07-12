@@ -35,9 +35,6 @@ def main():
     )
     st.write("\n\n\n")
 
-    st.warning('''If the mother presents a significant symptom not considered
-    by the model (e.g., stroke symptoms), disregard the model's prediction and
-    base the urgency purely on medical judgment.''', icon="⚠️")
 
     st.write("""Data was collected from five hospitals and one maternity clinic in Dhaka, Bangladesh.
     Patient health data was collected using wearable sensor devices, and risk levels were classified with the help of medical experts and literature review.

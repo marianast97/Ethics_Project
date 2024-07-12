@@ -50,8 +50,8 @@ def main():
         y_train = st.session_state.y_train
         X_test = st.session_state.X_test
         y_test = st.session_state.y_test
-        y_train = label_encoder.fit_transform(y_train)
-        y_test = label_encoder.fit_transform(y_test)
+        #y_train = label_encoder.fit_transform(y_train) #bug, the risk label was not showing up
+        #y_test = label_encoder.fit_transform(y_test) #bug, the risk label was not showing up
     
     st.write("## Prediction Simulator")
     st.title("Maternal Health Risk Prediction")
@@ -59,13 +59,17 @@ def main():
         "./love.png",
         icon_image="./heartbeat.gif",
     )
-    st.write("To get a better understanding of the model's decision process, it is necessary to understand both how changing that feature impacts the model’s output, and also the distribution of that feature’s values.")
-    st.write("This page allows you to explore the model's predictions by changing the feature values.")
+    #st.write("To get a better understanding of the model's decision process, it is necessary to understand both how changing that feature impacts the model’s output, and also the distribution of that feature’s values.")
+    st.write("This page allows you to explore the model's predictions by simulating different values.")
+    st.warning('''If the mother presents a significant symptom not considered by the model (e.g., stroke symptoms), disregard the model's prediction and
+    base the urgency purely on medical judgment.''', icon="⚠️")
+    
+
 
     # st.write("This page resembles 'What if... ?' It shows how the model prediction would change based on a change in the attribute values")
     st.write("\n\n")
     st.write("### What if... ?")
-    st.write("Select a sample from the sidebar to view and modify the feature values. The model prediction will be updated accordingly.")
+    st.write("Select a *mother_id* from the sidebar and change the values for the measurements to simulate the health risk prediction. The model prediction will be updated accordingly.")
     st.write("The new sample values are displayed below, alongwith the change from the original sample values.")
     
     model = load_model()
@@ -107,7 +111,7 @@ def main():
     sample_df = df_og.loc[[X_test.index[index]]]
     
     # Create sliders for each feature to modify the values
-    st.sidebar.write("Change feature values here:")
+    st.sidebar.write("Change attribute values here:")
     new_values = {}
     for col in sample.index:
         new_values[col] = st.sidebar.slider(col, int(X[col].min()), int(X[col].max()), int(sample[col]))
@@ -156,13 +160,13 @@ def main():
         st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
     
     st.toast('Simulator loaded', icon="✔️")
-    st.write("One can see how the output class probabilities change as the feature values are modified.")
+    st.write("One can see how the output class probabilities change as the attribute values are modified.")
     
-    st.write("\n\n")
-    st.write("### Key Findings")
-    st.write("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
+    #st.write("\n\n")
+    #st.write("### Key Findings")
+    #st.write("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
     
-    st.balloons()
+    #st.balloons()
         
     
 if __name__ == "__main__":
