@@ -13,7 +13,9 @@ import time
 from explainerdashboard import ClassifierExplainer, ExplainerDashboard
 from explainerdashboard.dashboard_components import *
 from sklearn.preprocessing import LabelEncoder
-import streamlit.components.v1 
+import streamlit.components.v1
+import plotly.graph_objects as go
+import plotly.io as pio
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -29,7 +31,62 @@ def load_data():
 def load_model():
     model = load("./random_forest_model.pkl")
     return model
+
+
+def create_pie_chart_original(predictions):
+    labels = ['High Risk', 'Low Risk', 'Mid Risk']
     
+    color_map = {
+        0: "#EA324C",
+        1: "#00B38A",
+        2: "#F2AC42"
+    }
+    colors = [color_map[i] for i in range(len(labels))]
+    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=predictions, marker=dict(colors=colors), hole=0.4)])
+
+    fig.update_layout(
+        title='Original Prediction',
+        height=600,  # increase the height of the chart
+        width=600,   # increase the width of the chart
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=0.0,
+            xanchor="center",
+            x=0.5
+        )
+    )
+    
+    return fig
+
+def create_pie_chart_new(predictions):
+    labels = ['High Risk', 'Low Risk', 'Mid Risk']
+    
+    color_map = {
+        0: "#EA324C",
+        1: "#00B38A",
+        2: "#F2AC42"
+    }
+    colors = [color_map[i] for i in range(len(labels))]
+    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=predictions, marker=dict(colors=colors), hole=0.4)])
+
+    fig.update_layout(
+        title='New Prediction',
+        height=600,  # increase the height of the chart
+        width=600,   # increase the width of the chart
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=0.0,
+            xanchor="center",
+            x=0.5
+        )
+    )
+    
+    return fig
+
     
 def main():
     df_og, target = load_data()
@@ -143,13 +200,17 @@ def main():
         explainer = ClassifierExplainer(model, X_test, y_test)
 
         prediction_component = ClassifierPredictionSummaryComponent(explainer, title="Original Prediction", index=index, hide_selector=True)
-        prediction_component_html = prediction_component.to_html()
-        st.components.v1.html(prediction_component_html, height=560, scrolling=False)
-        string = ""
+        #prediction_component_html = prediction_component.to_html()
+        #st.components.v1.html(prediction_component_html, height=560, scrolling=False)
+        #string = ""
         #for i, label in enumerate(label_encoder.classes_):
         #    string += f"{i}: {label},  ‎ " 
         #st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
 
+        predicted_probs = model.predict_proba(X_test_mod.iloc[[index]])[0]
+        pie_chart = create_pie_chart_original(predicted_probs)
+        st.plotly_chart(pie_chart)
+        
         predicted_class = model.predict(X_test.iloc[[index]])[0]
         class_name = label_encoder.classes_[predicted_class]
         
@@ -176,10 +237,15 @@ def main():
         X_test_mod.loc[sample_index] = new_sample.loc[0]
         
         explainer = ClassifierExplainer(model, X_test_mod, y_test)
-        prediction_component = ClassifierPredictionSummaryComponent(explainer, title="New Prediction", index=index, hide_selector=True)
-        prediction_component_html = prediction_component.to_html()
-        st.components.v1.html(prediction_component_html, height=560, scrolling=False)
-        string = ""
+        #prediction_component = ClassifierPredictionSummaryComponent(explainer, title="New Prediction", index=index, hide_selector=True)
+        #prediction_component_html = prediction_component.to_html()
+        #st.components.v1.html(prediction_component_html, height=560, scrolling=False)
+        #string = ""
+
+        predicted_probs = model.predict_proba(X_test_mod.iloc[[index]])[0]
+        pie_chart = create_pie_chart_new(predicted_probs)
+        st.plotly_chart(pie_chart)
+        
         #for i, label in enumerate(label_encoder.classes_):
         #    string += f"{i}: {label},  ‎ " 
         #st.write(f"‎ ‎ ‎ ‎ ‎ {string[:-3]}")
