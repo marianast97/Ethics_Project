@@ -1,197 +1,122 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.multiclass import OneVsRestClassifier
+import fairness_functions as ff
 
 
-# if 'clicked1' not in st.session_state:
-#     st.session_state.clicked1 = False
-    
-# if 'clicked2' not in st.session_state:
-#     st.session_state.clicked2 = False
+st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# if 'clicked3' not in st.session_state:
-#     st.session_state.clicked3 = False
-    
-# if 'stage' not in st.session_state:
-#     st.session_state.stage = 0
-    
-# def set_state(i):
-#     st.session_state.stage = i
-
-# protected = ["Age"]
-
-# # Load dataset
-# #@st.cache_data
-# def load_data():
-#     df = pd.read_csv("./Maternal Health Risk Data Set.csv")
-#     target = 'RiskLevel'
-#     return df, target
-
-# # Train Logistic Regression model
-# #@st.cache_data
-# def train_logistic_regression(X_train, y_train):
-#     model = LogisticRegression(max_iter=200)
-#     start_time = time.time()
-#     model.fit(X_train, y_train)
-#     training_time = time.time() - start_time
-#     return model, training_time
-
-# # Train Kernel Ridge Regression model
-# #@st.cache_data
-# def train_kernel_ridge_regression(X_train, y_train):
-#     model = KernelRidge(kernel='rbf')
-#     start_time = time.time()
-#     model.fit(X_train, y_train)
-#     training_time = time.time() - start_time
-#     return model, training_time
-
-# # Get predictions for entire dataset
-# def get_predictions(model, X):
-#     return np.round(model.predict(X)).astype(int)
-
-# # Remove selected attributes from dataframe
-# def remove_attributes(df, attributes):
-#     df = df.drop(columns=attributes)
-#     return df
-
-# # Display results
-# def display_results(model, X_test, y_test, training_time):
-#     y_pred = model.predict(X_test)
-#     y_pred = np.round(y_pred).astype(int)
-#     accuracy = accuracy_score(y_test, y_pred)
-    
-#     st.write(f"Model used: {model}")
-#     st.write(f"Training Time: {training_time:.4f} seconds")
-#     st.write(f"Accuracy: {accuracy:.4f}")
-    
-# def get_fairness_metrics(df, vars, new=False):
-#     for i, attribute in enumerate(vars):
-#         st.write("\n\n")
-#         st.write(f"︻デ═一 {attribute}")
-#         st.write("- **Group Fairness**")
-#         for val in sorted(df[attribute].unique()):
-#             group_fairness = ff.group_fairness(df, attribute, val, "Predictions", 1)
-#             st.write(f"P(DiabetesPrediction = 1 | {attribute} = {val}) = {group_fairness:.3f}")
-        
-#         st.write("- **Conditional statistical parity**")
-#         if new:
-#             cond = st.selectbox("Select the conditional attribute (default: 'Smoker'): ", ("Smoker", "HighBP", "HighChol", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost"), index=0, key=i+10)
-#         else:
-#             cond = st.selectbox("Select the conditional attribute (default: 'Smoker'): ", ("Smoker", "HighBP", "HighChol", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost"), index=0, key=i)
-#         for val in sorted(df[attribute].unique()):
-#             csp = ff.conditional_statistical_parity(df, attribute, val, "Predictions", 1, cond, 1)
-#             st.write(f"P(DiabetesPrediction = 1 | {attribute} = {val}, {cond} = 1) = {csp:.3f}")
-            
-#         st.write("- **Predictive parity**")
-#         for val in sorted(df[attribute].unique()):
-#             pp = ff.predictive_parity(df, attribute , val, "Predictions", "Diabetes_binary")
-#             st.write(f"Predictive parity ({attribute} = {val}) = {pp:.3f}")
-            
-#         st.write("- **False Positive Rate**")
-#         for val in sorted(df[attribute].unique()):
-#             fpr = ff.fp_error_rate_balance(df, attribute, val, "Predictions", "Diabetes_binary")
-#             st.write(f"False Positive Rate ({attribute} = {val}) = {fpr:.3f}")
-
-# def main():
-#     st.title("CDC Diabetes Health Indicators Fairness Analysis")
-
-#     # st.write(st.session_state)
-#     df, target = load_data()
-#     X = df.drop(target, axis=1)
-#     y = df[target]
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=444)
-
-#     st.sidebar.header("☢ Model Selection")
-#     model_option = st.sidebar.selectbox("Select Model", ("Logistic Regression", "Kernel Ridge Regression"))
-
-#     if model_option == "Logistic Regression":
-#         model, training_time = train_logistic_regression(X_train, y_train)
-#     else:
-#         model, training_time = train_kernel_ridge_regression(X_train[:3000], y_train[:3000])
-        
-#     st.write("Select a model from the sidebar for training and click the *Run* button to generate predictions for the entire dataset.")
-#     st.write("Again, *logistic regression* is trained on the entire dataset till a maximum of 200 iterations.")
-#     st.write("Whereas *kernel ridge regression* is trained using a Radial Basis Kernel and only on the first 3000 samples due to memory constraints.")
-
-#     # Button to get predictions for entire dataset
-    
-#     if st.sidebar.button("Run") or st.session_state.clicked1:
-#         df2 = df
-#         predictions = get_predictions(model, X)
-#         df2['Predictions'] = predictions
-#         cols = df2.columns.tolist()
-#         cols = cols[:1] + [cols[-1]] + cols[1:-1]
-#         df2 = df2[cols]
-#         st.session_state.clicked1 = True
-#         #st.session_state.clicked2 = False
-#         #st.session_state.clicked3 = False
-#         set_state(1)
-        
-#         st.write("\n\n\n")
-#         st.write(f"### ➾ CDC Diabetes Health Indicators Predictions")
-#         display_results(model, X_test, y_test, training_time)
-    
-#         st.write("\n\n\n")
-#         st.write(f"### ➾ Fairness Analysis")
-#         st.write("Select a protected variable from the sidebar and click on the *Analyse* button to get its fairness metrics .")
-    
-#     st.sidebar.write("---")
-#     st.sidebar.header("☢ PV Selection")
-#     attributes_to_analyse = st.sidebar.multiselect("Select the Protected variables to analyse", protected)
-#     if st.sidebar.button("Analyse") or st.session_state.clicked2:
-#         st.session_state.clicked2 = True
-#         # st.session_state.clicked3 = False
-#         set_state(2)
-#         get_fairness_metrics(df2, attributes_to_analyse)
-#         st.write("\n\n")
-#         st.write("One can observe that there is bias.")
-#         st.write("In order to mitigate this, we employ the strategy of removing the PVs and retraining the model.")
-        
-#         st.write("\n\n\n")
-#         st.write(f"### ➾ Predictions after Removing the PVs")
-#         st.write("Select the PVs you want to remove and click the *Remove and Retrain* button to retrain the model.")
-
-#     st.sidebar.write("---")
-#     st.sidebar.header("☢ PV Removal")
-#     # Multiselect option to remove attributes
-#     attributes_to_remove = st.sidebar.multiselect("Select the Protected variables to remove", protected)
-    
-#     # Button to remove selected attributes and train model again
-#     if st.sidebar.button("Remove and Retrain") or st.session_state.clicked3:
-#         st.session_state.clicked3 = True
-#         st.session_state.clicked2 = True
-#         st.session_state.clicked1 = True
-#         set_state(3)
-#         df_new = remove_attributes(df, attributes_to_remove)
-#         X = df_new.drop(target, axis=1)
-#         y = df_new[target]
-#         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=444)
-#         if model_option == "Logistic Regression":
-#             model, training_time = train_logistic_regression(X_train, y_train)
-#         else:
-#             model, training_time = train_kernel_ridge_regression(X_train[:3000], y_train[:3000])
-#         predictions = get_predictions(model, X)
-#         df2 = df
-#         df2['Predictions'] = predictions
-#         cols = df2.columns.tolist()
-#         cols = cols[:1] + [cols[-1]] + cols[1:-1]
-#         df2 = df2[cols]
-    
-#         st.write(f"Protected Variables Removed: {attributes_to_remove}")
-#         display_results(model, X_test, y_test, training_time)
-#         # st.write(df2)
-    
-#         st.write("\n\n\n")
-#         st.write(f"### ➾ Fairness Metrics after Removing the PVs")
-#         st.write("New predictions are generated after removing the selected PVs.")
-#         st.write("These are then joined with the original dataset to calculate the fairness metrics.")
-#         get_fairness_metrics(df2, attributes_to_analyse, new=True)
+# Load dataset
+@st.cache_data
+def load_data():
+    df = pd.read_csv("./Maternal Health Risk Data Set.csv")
+    target = 'RiskLevel'
+    return df, target
 
 def main():
-    st.title("🚧 Page Under Construction 🔨")
-    st.logo(
-        "./love.png",
-        icon_image="./heartbeat.gif",
-    )
-    st.image("./excavator.gif")
+    st.title("Fairness Metrics")
+
+    df, target = load_data()
+
+    # create a list of the conditions
+    conditions = [
+        (df['Age'] >= 10) & (df['Age'] <= 19),
+        (df['Age'] >= 20) & (df['Age'] <= 34),
+        (df['Age'] > 34)
+        ]
+    # create a list of the values we want to assign for each condition
+    values = ['teenager', 'adult', 'advanced maternal age']
+
+    # create a new column and use np.select to assign values to it using our lists as arguments
+    df['AgeGroup'] = np.select(conditions, values, default='unknown')
+
+    # Encode the target variable
+    # high risk = 0, low risk = 1, mid risk = 2, adult = 0, advanced maternal age = 1, teenager = 2
+    le = LabelEncoder()
+    df['AgeGroupEncoded'] = le.fit_transform(df['AgeGroup'])
+    df['RiskLevelEncoded'] = le.fit_transform(df['RiskLevel'])
+
+    # Split the data
+    X = df.drop(['AgeGroup','RiskLevel', 'RiskLevelEncoded'], axis=1)
+    y = df['RiskLevelEncoded']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train a One-vs-Rest classifier with RandomForest
+    rf_classifier = RandomForestClassifier(random_state=42)
+    ovr = OneVsRestClassifier(rf_classifier)
+    ovr.fit(X_train, y_train)
+
+    # Make predictions
+    y_pred = ovr.predict(X_test)
+
+    # Add predictions to the DataFrame for fairness functions
+    df_test = X_test.copy()
+    df_test['TrueLabel'] = y_test
+    df_test['Prediction'] = y_pred
+
+    # Group Fairness
+    high_risk_adult = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 0, 'Prediction', 0)
+    high_risk_adv_age = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 1, 'Prediction', 0)
+    high_risk_teen = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 2, 'Prediction', 0)
+    mid_risk_adult = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 0, 'Prediction', 2)
+    mid_risk_adv_age = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 1, 'Prediction', 2)
+    mid_risk_teen = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 2, 'Prediction', 2)
+    low_risk_adult = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 0, 'Prediction', 1)
+    low_risk_adv_age = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 1, 'Prediction', 1)
+    low_risk_teen = group_fairness_value = ff.group_fairness(df_test, 'AgeGroupEncoded', 2, 'Prediction', 1)
+
+    st.write("**Group Fairness:**")
+    group_fairness_df = pd.DataFrame({
+        "Age Group": ["Teenager", "Adult", "Advanced Maternal Age"],
+        "High Risk": [f"{high_risk_teen*100:.2f}%", f"{high_risk_adult*100:.2f}%", f"{high_risk_adv_age*100:.2f}%"],
+        "Mid Risk": [f"{mid_risk_teen*100:.2f}%", f"{mid_risk_adult*100:.2f}%", f"{mid_risk_adv_age*100:.2f}%"],
+        "Low Risk": [f"{low_risk_teen*100:.2f}%", f"{low_risk_adult*100:.2f}%", f"{low_risk_adv_age*100:.2f}%"]
+    })
+    group_fairness_df = group_fairness_df.style.set_properties(**{'text-align': 'left'})
+    group_fairness_df.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
+    st.dataframe(group_fairness_df, width=500, hide_index=True)
+
+    st.write("Group fairness aims to ensure that certain desirable properties or outcomes are evenly distributed among groups defined by sensitive attributes, such as age, gender, race, or socioeconomic status. For the sake of this project, we assumed age to be the sensitive attribute. Each group need to have the same probability of being assigned to the predicted class.")
+    st.write("For example, if we investigate the 'Age Group' then all groups, protected and unprotected should ideally have the same probability to receive a high risk, mid risk, and low risk prediction. Mathematically this is stated as followed:")
+    st.write(r"$P(RiskPrediction = high \vert Age Group = Advanced Maternal Age) == P(RiskPrediction = high \vert Age Group = Adult)$")
+
+    # Predictive Parity
+    ppv_adult = ff.predictive_parity(df_test, "AgeGroupEncoded", 0, "Prediction", "TrueLabel")
+    ppv_adv_age = ff.predictive_parity(df_test, "AgeGroupEncoded", 1, "Prediction", "TrueLabel")
+    ppv_teenager = ff.predictive_parity(df_test, "AgeGroupEncoded", 2, "Prediction", "TrueLabel")
+
+    st.write("**Predictive Parity:**")
+    ppv_df = pd.DataFrame({
+        "Age Group": ["Teenager", "Adult", "Advanced Maternal Age"],
+        "Positive Predictive Value (PPV)": [f"{ppv_teenager*100:.2f}%", f"{ppv_adult*100:.2f}%", f"{ppv_adv_age*100:.2f}%"]
+    })
+    ppv_df = ppv_df.style.set_properties(**{'text-align': 'left'})
+    ppv_df.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
+    st.dataframe(ppv_df, width=500, hide_index=True)
+
+    st.write("Predictive Parity measures the proportion of positive predictions that are actually correct. A high PPV indicates that we can be sure that a positive prediction is true.")
+    st.write("In our example, we would like to analyze whether different age groups are less likely to truly belong to the prediction and whether there is a significant difference among these three groups.")
+
+    # False Positive Error Rate Balance
+    fpr_adult = ff.fp_error_rate_balance(df_test, "AgeGroupEncoded", 0, "Prediction", "TrueLabel")
+    fpr_adv_age = ff.fp_error_rate_balance(df_test, "AgeGroupEncoded", 1, "Prediction", "TrueLabel")
+    fpr_teenager = ff.fp_error_rate_balance(df_test, "AgeGroupEncoded", 2, "Prediction", "TrueLabel")
+
+    st.write("**False Positive Error Rate Balance:**")
+    fpr_df = pd.DataFrame({
+        "Age Group": ["Teenager", "Adult", "Advanced Maternal Age"],
+        "False Positive Rate (FPR)": [f"{fpr_teenager*100:.2f}%", f"{fpr_adult*100:.2f}%", f"{fpr_adv_age*100:.2f}%"]
+    })
+    fpr_df = fpr_df.style.set_properties(**{'text-align': 'left'})
+    fpr_df.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
+    st.dataframe(fpr_df, width=500, hide_index=True)
+
+    st.write("False Positive Error Rate measures the proportion of negative cases that are incorrectly classified as positive. In other words, it tells you how often a model incorrectly predicts the positive class for cases that should be in the negative class.")
+    st.write("We would like to analyze if any age group is favored by having a higher FPR than the other, thus predicting it more often to be prone to other types risks even though they are not.")
 
 if __name__ == "__main__":
     main()
