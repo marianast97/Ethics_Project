@@ -1,6 +1,6 @@
 # HealthyMom App
 
-You can reach the web application [here](https://ethics-go-brrrrr.streamlit.app/).
+You can reach the web application [here](https://healthy-mom.streamlit.app/).
 
 ## Download Repository
 
