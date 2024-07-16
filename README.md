@@ -2,13 +2,17 @@
 
 You can check the web application [here](https://healthy-mom.streamlit.app/).
 
-You can also run the application on your local machine by following these steps
+You can also run the application on your local machine by following these steps:
 
 #### 1. Download Repository
 
 Download the repository to your machine.
 
-#### 2. Setup the Environment (use python **3.9.19**)
+```sh
+git clone https://github.com/marianast97/Ethics_Project.git
+```
+
+#### 2. Setup the Environment (prefer python **3.9.19**)
 
 ```sh
 conda create -n newenv python=3.9
@@ -38,7 +42,7 @@ pip install -r requirements.txt
 streamlit run Home.py
 ```
 
-This should open the app in your browser
+This should open the app in your browser for further exploration
 
 ---
 
