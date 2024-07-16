@@ -1,24 +1,46 @@
-# HealthyMom App
+## HealthyMom App
 
-You can reach the web application [here](https://healthy-mom.streamlit.app/).
+You can check the web application [here](https://healthy-mom.streamlit.app/).
 
-## Download Repository
+You can also run the application on your local machine by following these steps
 
-Download the repository to your own folder.
+#### 1. Download Repository
 
-## Run the Application
+Download the repository to your machine.
 
-You can also run the application on your local machine:
+#### 2. Setup the Environment (use python **3.9.19**)
 
+```sh
+conda create -n newenv python=3.9
 ```
+
+#### 3. Install necessary dependencies
+
+```sh
+conda activate newenv
+```
+
+- If you are using conda
+
+```sh
+conda env update -n newenv -f env.yml
+``` 
+
+- OR if you are using pip
+
+```sh
+pip install -r requirements.txt
+``` 
+
+#### 4. Run the App
+
+```sh
 streamlit run Home.py
 ```
 
-Python version: **3.9.19**
+This should open the app in your browser
 
-Use `env.yml` if you are using **conda**
+---
 
-Use `requirements.txt` if you want to use **pip**
-
-## Data Source
+#### Data Source
 https://archive.ics.uci.edu/dataset/863/maternal+health+risk
